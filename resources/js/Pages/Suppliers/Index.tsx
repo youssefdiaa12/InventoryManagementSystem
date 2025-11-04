@@ -20,6 +20,9 @@ interface PaginatedSuppliers {
         label: string;
         active: boolean;
     }[];
+    from?: number;
+    to?: number;
+    total?: number;
 }
 
 export default function Index({ suppliers }: { suppliers: PaginatedSuppliers }) {
@@ -55,17 +58,18 @@ export default function Index({ suppliers }: { suppliers: PaginatedSuppliers }) 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className=" p-8 "
+                className="p-8"
             >
                 {/* Header */}
-                <div className="flex justify-between items-center mb-6">
-                    <motion.h2
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="text-2xl font-semibold text-gray-800"
-                    >
-                        Supplier Management
-                    </motion.h2>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-3">
+                    <div>
+                        <h2 className="text-2xl font-semibold text-gray-800">
+                            Supplier Management
+                        </h2>
+                        <p className="text-gray-500 text-sm">
+                            Manage your suppliers and their contact details.
+                        </p>
+                    </div>
 
                     <motion.a
                         href={route("suppliers.create")}
@@ -88,77 +92,96 @@ export default function Index({ suppliers }: { suppliers: PaginatedSuppliers }) 
                 />
 
                 {/* Table */}
-                <motion.div className="overflow-x-auto">
-                    <table className="w-full border bg-white rounded-xl shadow-md">
+                <motion.div className="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-md">
+                    <table className="w-full border-collapse text-sm">
                         <thead>
-                            <tr className="bg-gray-200 text-left border text-gray-700">
-                                <th className="px-4 py-3 border-b">Name</th>
-                                <th className="px-4 py-3 border-b">Email</th>
-                                <th className="px-4 py-3 border-b">Phone</th>
-                                <th className="px-4 py-3 border-b">Address</th>
-                                <th className="px-4 py-3 border-b text-right">Actions</th>
+                            <tr className="bg-gray-100 text-left text-gray-700">
+                                <th className="px-4 py-3 font-medium">Name</th>
+                                <th className="px-4 py-3 font-medium">Email</th>
+                                <th className="px-4 py-3 font-medium">Phone</th>
+                                <th className="px-4 py-3 font-medium">Address</th>
+                                <th className="px-4 py-3 text-right font-medium">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <AnimatePresence>
-                                {filtered.map((s) => (
-                                    <motion.tr
-                                        key={s.id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="hover:bg-gray-50 transition"
-                                    >
-                                        <td className="px-4 py-3 border-b font-medium text-gray-800">
-                                            {s.name}
+                                {filtered.length > 0 ? (
+                                    filtered.map((s) => (
+                                        <motion.tr
+                                            key={s.id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0 }}
+                                            className="hover:bg-gray-50 transition"
+                                        >
+                                            <td className="px-4 py-3 text-gray-800 font-medium">{s.name}</td>
+                                            <td className="px-4 py-3 text-gray-600">{s.email}</td>
+                                            <td className="px-4 py-3 text-gray-600">{s.phone}</td>
+                                            <td className="px-4 py-3 text-gray-600">{s.address}</td>
+                                            <td className="px-4 py-3 text-right">
+                                                <div className="flex justify-end space-x-2">
+                                                    <motion.a
+                                                        href={route("suppliers.edit", s.id)}
+                                                        whileHover={{ scale: 1.1 }}
+                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition"
+                                                    >
+                                                        <Pencil className="w-5 h-5" />
+                                                    </motion.a>
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.1 }}
+                                                        onClick={() => setSelectedSupplier(s)}
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-md transition"
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </motion.button>
+                                                </div>
+                                            </td>
+                                        </motion.tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td
+                                            colSpan={5}
+                                            className="py-10 text-center text-gray-500"
+                                        >
+                                            🧾 No suppliers found.
                                         </td>
-                                        <td className="px-4 py-3 border-b text-gray-600">{s.email}</td>
-                                        <td className="px-4 py-3 border-b text-gray-600">{s.phone}</td>
-                                        <td className="px-4 py-3 border-b text-gray-600">{s.address}</td>
-                                        <td className="px-4 py-3 border-b text-right flex justify-end space-x-2">
-                                            <motion.a
-                                                href={route("suppliers.edit", s.id)}
-                                                whileHover={{ scale: 1.1 }}
-                                                className="p-2 rounded-md text-blue-600 hover:bg-blue-50 transition"
-                                            >
-                                                <Pencil className="w-5 h-5" />
-                                            </motion.a>
-
-                                            <motion.button
-                                                whileHover={{ scale: 1.1 }}
-                                                onClick={() => setSelectedSupplier(s)}
-                                                className="p-2 rounded-md text-red-600 hover:bg-red-50 transition"
-                                            >
-                                                <Trash2 className="w-5 h-5" />
-                                            </motion.button>
-                                        </td>
-                                    </motion.tr>
-                                ))}
+                                    </tr>
+                                )}
                             </AnimatePresence>
                         </tbody>
                     </table>
                 </motion.div>
 
-                {/* Pagination */}
-                <div className="flex justify-center mt-6 space-x-2">
-                    {suppliers.links.map((link, i) => (
-                        <button
-                            key={i}
-                            disabled={!link.url}
-                            onClick={() => link.url && router.visit(link.url)}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                                link.active
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            } ${!link.url ? "opacity-50 cursor-not-allowed" : ""}`}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                        />
-                    ))}
-                </div>
+                {/* Conditional Pagination */}
+                {filtered.length > 0 && (
+                    <div className="flex flex-col sm:flex-row justify-between items-center mt-6 text-sm text-gray-600 gap-3">
+                        {suppliers.from && suppliers.to && suppliers.total && (
+                            <p>
+                                Showing {suppliers.from} to {suppliers.to} of {suppliers.total} results
+                            </p>
+                        )}
+
+                        <div className="flex space-x-1">
+                            {suppliers.links.map((link, i) => (
+                                <button
+                                    key={i}
+                                    disabled={!link.url}
+                                    onClick={() => link.url && router.visit(link.url)}
+                                    className={`px-3 py-1 rounded-md border text-sm ${link.active
+                                            ? "bg-blue-600 text-white border-blue-600"
+                                            : "bg-white hover:bg-gray-100 border-gray-300"
+                                        } ${!link.url ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
             </motion.div>
 
-            {/* Delete Confirmation Dialog (unchanged) */}
+            {/* Delete Confirmation Dialog */}
             <AnimatePresence>
                 {selectedSupplier && (
                     <motion.div
