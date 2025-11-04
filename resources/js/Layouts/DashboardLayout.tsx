@@ -46,7 +46,10 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
                     <nav className="mt-6 space-y-1 px-2">
                         <SidebarLink href="/dashboard" icon={<LayoutDashboard />} label="Dashboard" />
                         <SidebarLink href="/products" icon={<Package />} label="Products" />
-                        <SidebarLink href="/suppliers" icon={<Users />} label="Suppliers" />
+                        {/* ✅ Only show for admin users */}
+                        {auth.user?.role === "admin" && (
+                            <SidebarLink href="/suppliers" icon={<Users />} label="Suppliers" />
+                        )}
                     </nav>
                 </div>
 
