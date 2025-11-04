@@ -28,20 +28,20 @@ export default function Index({ products = { data: [], links: [] }, suppliers = 
     };
 
     const confirmDelete = () => {
-    if (!selectedProduct) return;
+        if (!selectedProduct) return;
 
-    router.delete(route("products.destroy", selectedProduct.id), {
-        onSuccess: () => {
-            toast.success("Product deleted successfully!");
-            setDeleteDialog(false);
-            setSelectedProduct(null);
-        },
-        onError: () => {
-            toast.error("Failed to delete product. Please try again.");
-            setDeleteDialog(false);
-        },
-    });
-};
+        router.delete(route("products.destroy", selectedProduct.id), {
+            onSuccess: () => {
+                toast.success("Product deleted successfully!");
+                setDeleteDialog(false);
+                setSelectedProduct(null);
+            },
+            onError: () => {
+                toast.error("Failed to delete product. Please try again.");
+                setDeleteDialog(false);
+            },
+        });
+    };
 
 
     return (
@@ -62,14 +62,28 @@ export default function Index({ products = { data: [], links: [] }, suppliers = 
                             Manage your product list, suppliers, and stock details.
                         </p>
                     </div>
-                    <Link
-                        href={route("products.create")}
-                        className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm"
-                    >
-                        <Plus className="w-5 h-5" />
-                        <span>Add New Product</span>
-                    </Link>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                        <Link
+                            href={route("products.create")}
+                            className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm"
+                        >
+                            <Plus className="w-5 h-5" />
+                            <span>Add New Product</span>
+                        </Link>
+
+                        <motion.a
+                            href={route("products.trash")}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition shadow-sm"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                            <span>View Trash</span>
+                        </motion.a>
+                    </div>
                 </div>
+
 
                 {/* Filters */}
                 <div className="flex flex-wrap gap-3 mb-6 items-center">
@@ -136,17 +150,13 @@ export default function Index({ products = { data: [], links: [] }, suppliers = 
                                                 <div className="w-10 h-10 bg-gray-100 flex items-center justify-center rounded-lg">
                                                     <Package className="w-6 h-6 text-gray-500" />
                                                 </div>
-                                                <span className="font-medium text-gray-800 truncate">
-                                                    {p.name}
-                                                </span>
+                                                <span className="font-medium text-gray-800 truncate">{p.name}</span>
                                             </td>
                                             <td className="px-6 py-4 text-gray-600">{p.sku}</td>
                                             <td className="px-6 py-4 text-gray-600">EGP{p.cost}</td>
                                             <td className="px-6 py-4 text-gray-600">EGP{p.price}</td>
                                             <td className="px-6 py-4 text-gray-600">{p.quantity}</td>
-                                            <td className="px-6 py-4 text-gray-600">
-                                                {p.supplier?.name ?? "-"}
-                                            </td>
+                                            <td className="px-6 py-4 text-gray-600">{p.supplier?.name ?? "-"}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex justify-end items-center space-x-2">
                                                     <Link
@@ -167,11 +177,8 @@ export default function Index({ products = { data: [], links: [] }, suppliers = 
                                     ))
                                 ) : (
                                     <tr>
-                                        <td
-                                            colSpan={7}
-                                            className="py-8 text-center text-gray-500"
-                                        >
-                                            No products found.
+                                        <td colSpan={7} className="py-10 text-center text-gray-500">
+                                            🧺 No products found.
                                         </td>
                                     </tr>
                                 )}
@@ -180,25 +187,28 @@ export default function Index({ products = { data: [], links: [] }, suppliers = 
                     </table>
                 </div>
 
-                {/* Pagination */}
-                <div className="flex flex-col sm:flex-row justify-between items-center mt-6 text-sm text-gray-600 gap-3">
-                    <p>
-                        Showing {products.from} to {products.to} of {products.total} results
-                    </p>
-                    <div className="flex space-x-1">
-                        {products.links.map((link: any, i: number) => (
-                            <Link
-                                key={i}
-                                href={link.url ?? "#"}
-                                className={`px-3 py-1 rounded-md border text-sm ${link.active
-                                        ? "bg-blue-600 text-white border-blue-600"
-                                        : "bg-white hover:bg-gray-100 border-gray-300"
-                                    } ${!link.url ? "opacity-50 cursor-not-allowed" : ""}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
+                {/* Conditional Pagination & Summary */}
+                {filtered.length > 0 && products.links.length > 3 && (
+                    <div className="flex flex-col sm:flex-row justify-between items-center mt-6 text-sm text-gray-600 gap-3">
+                        <p>
+                            Showing {products.from} to {products.to} of {products.total} results
+                        </p>
+                        <div className="flex space-x-1">
+                            {products.links.map((link: any, i: number) => (
+                                <Link
+                                    key={i}
+                                    href={link.url ?? "#"}
+                                    className={`px-3 py-1 rounded-md border text-sm ${link.active
+                                            ? "bg-blue-600 text-white border-blue-600"
+                                            : "bg-white hover:bg-gray-100 border-gray-300"
+                                        } ${!link.url ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
+
 
                 {/* Delete Confirmation Dialog */}
                 <AnimatePresence>

@@ -14,7 +14,7 @@ class ProductController extends Controller
     {
         $products = Product::with('supplier')
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(5);
             
 
         return Inertia::render('Products/Index', [
@@ -96,4 +96,37 @@ class ProductController extends Controller
             'product' => $product->load('supplier'),
         ]);
     }
+
+    public function trash()
+{
+    $products = Product::onlyTrashed()
+        ->with('supplier')
+        ->orderBy('deleted_at', 'desc')
+        ->paginate(10);
+
+    return Inertia::render('Products/Trash', [
+        'products' => $products,
+    ]);
+}
+
+    // Restore a soft-deleted product
+public function restore($id)
+{
+    $product = Product::withTrashed()->findOrFail($id);
+    $product->restore();
+
+    return redirect()->route('products.index')
+        ->with('success', 'Product restored successfully.');
+}
+
+// Permanently delete (hard delete)
+public function forceDelete($id)
+{
+    $product = Product::withTrashed()->findOrFail($id);
+    $product->forceDelete();
+
+    return redirect()->route('products.index')
+        ->with('success', 'Product permanently deleted.');
+}
+
 }
