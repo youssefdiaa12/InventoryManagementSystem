@@ -133,4 +133,13 @@ public function forceDelete($id)
         ->with('success', 'Product permanently deleted.');
 }
 
+public function stockManagement()
+{
+    $products = Product::with('supplier')->orderBy('name')->get();
+
+    return Inertia::render('StockManagement/Index', [
+        'products' => $products,
+    ]);
+}
+
 }

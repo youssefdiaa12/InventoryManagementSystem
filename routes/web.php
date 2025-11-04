@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StockManagementController;
 use App\Http\Controllers\StockTransactionController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Foundation\Application;
@@ -56,11 +57,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('stock.create');
     Route::post('/stock', [StockTransactionController::class, 'store'])
         ->name('stock.store');
+
     Route::get('/stock-transactions/create', [StockTransactionController::class, 'create'])
         ->name('stock-transactions.create');
-
     Route::post('/stock-transactions', [StockTransactionController::class, 'store'])
         ->name('stock-transactions.store');
+        
+
+        Route::get('/stockmanagement', [StockManagementController::class, 'index'])
+        ->name('stockmanagement.index');
+
+       Route::get('stockmanagement/transactions', [StockManagementController::class, 'allTransactions'])
+    ->name('stock.transactions');
+
+
 });
 
 

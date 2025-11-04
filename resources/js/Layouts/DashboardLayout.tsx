@@ -9,6 +9,8 @@ import {
     User,
     Boxes,
     ArrowLeftRight,
+    OrigamiIcon,
+    StrikethroughIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -52,6 +54,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
                             <SidebarLink href="/suppliers" icon={<Users />} label="Suppliers" />
                         )}
                         <SidebarLink href="/stock" icon={<ArrowLeftRight />} label="Stock Movements" />
+                        <SidebarLink href="/stockmanagement" icon={<StrikethroughIcon />} label="Stock Management" />
                     </nav>
                 </div>
 
@@ -133,16 +136,18 @@ function SidebarLink({
     label: string;
 }) {
     const page = usePage();
-    const active = page.url.startsWith(href);
+    const active =
+        page.url === href || page.url.startsWith(`${href}/`);
 
     return (
         <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 300 }}>
             <Link
                 href={href}
-                className={`flex items-center space-x-3 p-3 rounded-lg transition hover:bg-blue-50 ${active
-                    ? "bg-blue-100 text-blue-700 font-medium"
-                    : "text-gray-700"
-                    }`}
+                className={`flex items-center space-x-3 p-3 rounded-lg transition hover:bg-blue-50 ${
+                    active
+                        ? "bg-blue-100 text-blue-700 font-medium"
+                        : "text-gray-700"
+                }`}
             >
                 <span className="w-5 h-5">{icon}</span>
                 <span>{label}</span>
@@ -150,3 +155,4 @@ function SidebarLink({
         </motion.div>
     );
 }
+
