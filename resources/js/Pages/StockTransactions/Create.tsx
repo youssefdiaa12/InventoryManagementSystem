@@ -86,8 +86,8 @@ export default function Create() {
                                             type="button"
                                             onClick={() => setData("type", type)}
                                             className={`flex-1 py-2.5 rounded-lg border text-center capitalize font-medium transition ${data.type === type
-                                                    ? "bg-blue-600 text-white border-blue-600"
-                                                    : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                                                ? "bg-blue-600 text-white border-blue-600"
+                                                : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                                                 }`}
                                         >
                                             {type}
@@ -243,6 +243,22 @@ export default function Create() {
                                             {selectedProduct.sku || "—"}
                                         </span>
                                     </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="font-medium text-gray-600">Unit Price</span>
+                                        <span className="text-gray-800 font-semibold">
+                                            {selectedProduct
+                                                ? new Intl.NumberFormat("en-EG", {
+                                                    style: "currency",
+                                                    currency: "EGP",
+                                                }).format(
+                                                    data.type === "inbound"
+                                                        ? Number(selectedProduct.cost || 0)
+                                                        : Number(selectedProduct.price || 0)
+                                                )
+                                                : "—"}
+                                        </span>
+                                    </div>
+
 
                                     <hr className="my-2 border-gray-200" />
 
@@ -257,8 +273,8 @@ export default function Create() {
                                         <span className="font-medium text-gray-600">Quantity to Move</span>
                                         <span
                                             className={`font-semibold ${data.type === "inbound"
-                                                    ? "text-green-600"
-                                                    : "text-red-600"
+                                                ? "text-green-600"
+                                                : "text-red-600"
                                                 }`}
                                         >
                                             {data.type === "inbound" ? `+${moveQty}` : `-${moveQty}`} Units
@@ -273,6 +289,30 @@ export default function Create() {
                                             {newStock} Units
                                         </span>
                                     </div>
+
+
+                                    <div className="flex justify-between items-center text-sm mt-2">
+                                        <span className="font-medium text-gray-600">
+                                            Transaction Value
+                                        </span>
+                                        <span
+                                            className={`font-bold text-base ${data.type === "inbound" ? "text-green-700" : "text-red-700"
+                                                }`}
+                                        >
+                                            {selectedProduct && moveQty > 0
+                                                ? new Intl.NumberFormat("en-EG", {
+                                                    style: "currency",
+                                                    currency: "EGP",
+                                                }).format(
+                                                    (data.type === "inbound"
+                                                        ? Number(selectedProduct.cost || 0)
+                                                        : Number(selectedProduct.price || 0)) * moveQty
+                                                )
+                                                : "EGP 0.00"}
+                                        </span>
+                                    </div>
+
+
                                 </div>
 
                                 {data.type === "outbound" && moveQty > currentStock && (

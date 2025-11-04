@@ -12,7 +12,7 @@ class StockTransactionController extends Controller
     public function create()
     {
         return Inertia::render('StockTransactions/Create', [
-            'products' => Product::select('id', 'name', 'sku', 'quantity')->get(),
+    'products' => Product::select('id', 'name', 'sku', 'quantity', 'cost', 'price')->get(),
         ]);
     }
 
@@ -27,6 +27,9 @@ class StockTransactionController extends Controller
         ]);
 
         $product = Product::findOrFail($validated['product_id']);
+        $transactionValue = $validated['type'] === 'inbound'
+        ? $product->cost * $validated['quantity']
+        : $product->price * $validated['quantity'];
 
         // Handle stock change
         if ($validated['type'] === 'outbound') {
@@ -50,6 +53,7 @@ class StockTransactionController extends Controller
             'quantity' => $validated['quantity'],
             'reason' => $validated['reason'],
             'notes' => $validated['notes'],
+            'value' => $transactionValue, 
         ]);
 
 
