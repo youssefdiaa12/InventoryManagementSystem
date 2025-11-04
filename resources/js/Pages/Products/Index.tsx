@@ -1,17 +1,9 @@
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link, router } from "@inertiajs/react";
-import { Plus, Pencil, Trash2, Search, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Package, X } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/Components/ui/dialog";
-import { Button } from "@/Components/ui/button";
+import toast from "react-hot-toast";
 
 export default function Index({ products = { data: [], links: [] }, suppliers = [] }: any) {
     const [search, setSearch] = useState("");
@@ -36,11 +28,21 @@ export default function Index({ products = { data: [], links: [] }, suppliers = 
     };
 
     const confirmDelete = () => {
-        if (selectedProduct) {
-            router.delete(route("products.destroy", selectedProduct.id));
+    if (!selectedProduct) return;
+
+    router.delete(route("products.destroy", selectedProduct.id), {
+        onSuccess: () => {
+            toast.success("Product deleted successfully!");
             setDeleteDialog(false);
-        }
-    };
+            setSelectedProduct(null);
+        },
+        onError: () => {
+            toast.error("Failed to delete product. Please try again.");
+            setDeleteDialog(false);
+        },
+    });
+};
+
 
     return (
         <DashboardLayout>
@@ -83,26 +85,26 @@ export default function Index({ products = { data: [], links: [] }, suppliers = 
                     </div>
 
                     {/* Supplier Dropdown */}
-    <div className="relative min-w-[200px] flex-1 sm:flex-none">
-        <select
-            value={selectedSupplier}
-            onChange={(e) => setSelectedSupplier(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none"
-        >
-            <option value="">All Suppliers</option>
+                    <div className="relative min-w-[200px] flex-1 sm:flex-none">
+                        <select
+                            value={selectedSupplier}
+                            onChange={(e) => setSelectedSupplier(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none"
+                        >
+                            <option value="">All Suppliers</option>
 
-            {(Array.isArray(suppliers) ? suppliers : []).map((s: any) => (
-                <option key={s.id} value={s.name}>
-                    {s.name}
-                </option>
-            ))}
-        </select>
+                            {(Array.isArray(suppliers) ? suppliers : []).map((s: any) => (
+                                <option key={s.id} value={s.name}>
+                                    {s.name}
+                                </option>
+                            ))}
+                        </select>
 
-        {/* Dropdown arrow icon */}
-        <div className="absolute right-3 top-2.5 text-gray-400 pointer-events-none">
-            ▼
-        </div>
-    </div>
+                        {/* Dropdown arrow icon */}
+                        <div className="absolute right-3 top-2.5 text-gray-400 pointer-events-none">
+                            ▼
+                        </div>
+                    </div>
                 </div>
 
                 {/* Table */}
@@ -188,43 +190,74 @@ export default function Index({ products = { data: [], links: [] }, suppliers = 
                             <Link
                                 key={i}
                                 href={link.url ?? "#"}
-                                className={`px-3 py-1 rounded-md border text-sm ${
-                                    link.active
+                                className={`px-3 py-1 rounded-md border text-sm ${link.active
                                         ? "bg-blue-600 text-white border-blue-600"
                                         : "bg-white hover:bg-gray-100 border-gray-300"
-                                } ${!link.url ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    } ${!link.url ? "opacity-50 cursor-not-allowed" : ""}`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}
                     </div>
                 </div>
 
-                {/* Delete Dialog */}
-                <Dialog open={deleteDialog} onOpenChange={setDeleteDialog}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Confirm Delete</DialogTitle>
-                            <DialogDescription>
-                                Are you sure you want to delete{" "}
-                                <span className="font-semibold text-gray-800">
-                                    {selectedProduct?.name}
-                                </span>
-                                ? This action cannot be undone.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter className="flex justify-end space-x-2">
-                            <Button
-                                variant="outline"
-                                onClick={() => setDeleteDialog(false)}
+                {/* Delete Confirmation Dialog */}
+                <AnimatePresence>
+                    {deleteDialog && selectedProduct && (
+                        <motion.div
+                            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative"
                             >
-                                Cancel
-                            </Button>
-                            <Button variant="destructive" onClick={confirmDelete}>
-                                Delete
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                                {/* Close Button */}
+                                <button
+                                    onClick={() => setDeleteDialog(false)}
+                                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+
+                                {/* Dialog Content */}
+                                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                                    Confirm Deletion
+                                </h2>
+                                <p className="text-gray-600 mb-6">
+                                    Are you sure you want to delete{" "}
+                                    <span className="font-medium text-gray-900">
+                                        {selectedProduct?.name}
+                                    </span>
+                                    ? This action cannot be undone.
+                                </p>
+
+                                {/* Action Buttons */}
+                                <div className="flex justify-end space-x-3">
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        onClick={() => setDeleteDialog(false)}
+                                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                                    >
+                                        Cancel
+                                    </motion.button>
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        onClick={confirmDelete}
+                                        className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                                    >
+                                        Delete
+                                    </motion.button>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
             </motion.div>
         </DashboardLayout>
     );
