@@ -23,19 +23,19 @@ export default function Welcome({ auth }: { auth: any }) {
         <>
             <Head title="Welcome" />
 
-            <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="min-h-screen bg-gray-100 flex flex-col">
 
                 {/* NAVBAR */}
                 <Navbar auth={auth} />
 
                 {/* HERO SECTION */}
-                <section className="flex-1 flex flex-col items-center justify-center text-center px-6 pt-20 pb-24">
+                <section className="flex-1 max-h-screen m-auto flex flex-col items-center justify-center text-center px-6 pt-20 pb-24">
 
                     <motion.div
                         initial={{ scale: 0.7, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, ease: "easeOut" }}
-                        className="w-28 h-28 rounded-2xl bg-blue-100 flex items-center justify-center mb-8 shadow-lg"
+                        className="w-28 h-28 rounded-2xl bg-blue-50 flex items-center justify-center mb-8 "
                     >
                         <Boxes className="h-14 w-14 text-blue-600" />
                     </motion.div>
@@ -107,81 +107,72 @@ export default function Welcome({ auth }: { auth: any }) {
                     </motion.div>
                 </section>
 
-                <section className="bg-white py-20 border-t">
+                {/* FEATURES SECTION */}
+                <section className="bg-gradient-to-b from-white to-blue-50 py-24 border-t">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                         className="max-w-7xl mx-auto text-center mb-16 px-6"
                     >
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                            Everything You Need to Stay in Control
+                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                            Manage Everything in One Place
                         </h2>
                         <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-                            Powerful features built to help you manage stock, suppliers, and workflow efficiently.
+                            Simplify your inventory management workflow with powerful, easy-to-use tools designed for speed and clarity.
                         </p>
                     </motion.div>
 
-                    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-6">
-
-                        <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            transition={{ type: "spring", stiffness: 200 }}
-                            className="text-center p-6 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition"
-                        >
-                            <PackageSearch className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                Advanced Product Tracking
-                            </h3>
-                            <p className="text-gray-600 text-sm leading-relaxed">
-                                Monitor product availability, variations, prices, and categories with precision.
-                            </p>
-                        </motion.div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            transition={{ type: "spring", stiffness: 200 }}
-                            className="text-center p-6 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition"
-                        >
-                            <Truck className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                Supplier Management
-                            </h3>
-                            <p className="text-gray-600 text-sm leading-relaxed">
-                                Keep supplier information organized and build more reliable inventory channels.
-                            </p>
-                        </motion.div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            transition={{ type: "spring", stiffness: 200 }}
-                            className="text-center p-6 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition"
-                        >
-                            <ClipboardList className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                Stock Movement Logs
-                            </h3>
-                            <p className="text-gray-600 text-sm leading-relaxed">
-                                Track every inbound and outbound stock movement with full history logs.
-                            </p>
-                        </motion.div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            transition={{ type: "spring", stiffness: 200 }}
-                            className="text-center p-6 bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition md:col-span-3"
-                        >
-                            <BarChart3 className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                Real-Time Inventory Insights
-                            </h3>
-                            <p className="text-gray-600 text-sm leading-relaxed max-w-xl mx-auto">
-                                Make smarter decisions with real-time analytics on stock trends, low inventory alerts,
-                                product turnover, and supplier performance.
-                            </p>
-                        </motion.div>
+                    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 px-6">
+                        {[
+                            {
+                                icon: PackageSearch,
+                                title: "Advanced Product Tracking",
+                                desc: "Stay updated with accurate product counts, variants, and pricing in real-time.",
+                            },
+                            {
+                                icon: Truck,
+                                title: "Supplier Management",
+                                desc: "Organize supplier data, monitor reliability, and maintain seamless operations.",
+                            },
+                            {
+                                icon: ClipboardList,
+                                title: "Stock Movement Logs",
+                                desc: "Track every stock transfer, inbound, and outbound activity effortlessly.",
+                            },
+                        ].map((item, i) => (
+                            <motion.div
+                                key={i}
+                                whileHover={{ scale: 1.05, rotate: 0.5 }}
+                                transition={{ type: "spring", stiffness: 250 }}
+                                className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition border border-blue-100"
+                            >
+                                <item.icon className="h-14 w-14 text-blue-600 mx-auto mb-4" />
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                    {item.title}
+                                </h3>
+                                <p className="text-gray-600 text-sm leading-relaxed">
+                                    {item.desc}
+                                </p>
+                            </motion.div>
+                        ))}
                     </div>
+
+                    <motion.div
+                        whileHover={{ scale: 1.03 }}
+                        transition={{ duration: 0.4 }}
+                        className="mt-20 max-w-5xl mx-auto text-center bg-white/70 backdrop-blur-md border border-blue-100 p-12 rounded-2xl shadow-lg"
+                    >
+                        <BarChart3 className="h-14 w-14 text-blue-600 mx-auto mb-4" />
+                        <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                            Real-Time Insights
+                        </h3>
+                        <p className="text-gray-700 text-base max-w-2xl mx-auto">
+                            Visualize your stock turnover, supplier performance, and low-inventory trends instantly — 
+                            so you can make smarter, faster decisions.
+                        </p>
+                    </motion.div>
                 </section>
 
                 {/* FOOTER */}
