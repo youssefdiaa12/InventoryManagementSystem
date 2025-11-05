@@ -47,14 +47,17 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
 
                     {/* Navigation */}
                     <nav className="mt-6 space-y-1 px-2">
-                        <SidebarLink href="/dashboard" icon={<LayoutDashboard />} label="Dashboard" />
+                        {auth.user?.role === "admin" && (
+                            <SidebarLink href="/dashboard" icon={<LayoutDashboard />} label="Dashboard" />
+                        )}
+                        <SidebarLink href="/stockmanagement" icon={<Warehouse />} label="Stock Management" />
+
                         <SidebarLink href="/products" icon={<Package />} label="Products" />
-                        {/* ✅ Only show for admin users */}
+                        {/* Only show for admin users */}
                         {auth.user?.role === "admin" && (
                             <SidebarLink href="/suppliers" icon={<Users />} label="Suppliers" />
                         )}
                         <SidebarLink href="/stock" icon={<ArrowLeftRight />} label="Stock Movements" />
-                        <SidebarLink href="/stockmanagement" icon={<Warehouse />} label="Stock Management" />
                         <SidebarLink href="/reports" icon={<ChartBar />} label="Reports" />
 
                     </nav>
@@ -145,11 +148,10 @@ function SidebarLink({
         <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 300 }}>
             <Link
                 href={href}
-                className={`flex items-center space-x-3 p-3 rounded-lg transition hover:bg-blue-50 ${
-                    active
+                className={`flex items-center space-x-3 p-3 rounded-lg transition hover:bg-blue-50 ${active
                         ? "bg-blue-100 text-blue-700 font-medium"
                         : "text-gray-700"
-                }`}
+                    }`}
             >
                 <span className="w-5 h-5">{icon}</span>
                 <span>{label}</span>

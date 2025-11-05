@@ -30,7 +30,7 @@ export default function Edit({
                             className="flex items-center gap-1 hover:text-blue-600 transition"
                         >
                             <Home className="w-4 h-4" />
-                            Dashboard
+                            Home
                         </Link>
                         <ChevronRight className="w-4 h-4 mx-1 text-gray-400" />
                         <span className="text-gray-700 font-medium">Profile</span>

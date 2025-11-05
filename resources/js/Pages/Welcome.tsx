@@ -57,12 +57,26 @@ export default function Welcome({ auth }: { auth: any }) {
                         transition={{ duration: 0.6, delay: 0.35 }}
                         className="flex space-x-4"
                     >
-                        {auth.user ? (
+                        {auth.user?.role === "admin" ? (
                             <Link
                                 href={route("dashboard")}
                                 className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 shadow transition"
                             >
                                 Go to Dashboard
+                            </Link>
+                        ) : auth.user?.role === "manager" ? (
+                            <Link
+                                href={route("stockmanagement.index")}
+                                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 shadow transition"
+                            >
+                                Go to Warehouse
+                            </Link>
+                        ) : auth.user?.role === 'user' ? (
+                            <Link
+                                href={route("welcome")}
+                                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 shadow transition"
+                            >
+                                Welcome , please contact admin
                             </Link>
                         ) : (
                             <>

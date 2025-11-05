@@ -31,9 +31,13 @@ export default function Navbar({ auth }: { auth: any }) {
                 <nav className="flex items-center space-x-6 text-gray-700 font-medium">
 
                     {/* If user is logged in — show Dashboard */}
-                    {auth?.user ? (
+                    {auth?.user=== 'admin' ? (
                         <Link href={route("dashboard")} className="hover:text-blue-600">
                             Dashboard
+                        </Link>
+                    ) :auth?.user.role=='manager' ? (
+                        <Link href={route("stockmanagement.index")} className="hover:text-blue-600">
+                            Warehouse
                         </Link>
                     ) : (
                         <>
