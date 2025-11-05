@@ -6,58 +6,62 @@ use App\Models\Product;
 use App\Models\StockTransaction;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        //Filters
-        $startDate = $request->input('startDate', now()->subWeek()); // default last 7 days
-        $endDate = $request->input('endDate', now());
-        $supplierId = $request->input('supplier_id'); // optional supplier filter
+        // Filters from request
+        $startDate = $request->input('startDate', now()->subWeek()->startOfDay());
+        $endDate = $request->input('endDate', now()->endOfDay());
+        $supplierId = $request->input('supplierId'); 
 
-        // Base query with optional supplier filter
+        // Base query for stock transactions with optional supplier filter
         $baseQuery = StockTransaction::join('products', 'stock_transactions.product_id', '=', 'products.id');
-
         if ($supplierId) {
             $baseQuery->where('products.supplier_id', $supplierId);
         }
 
-        //Total outbound value (sales)
+        // Total outbound value (Sales)
         $totalSales = (clone $baseQuery)
             ->where('stock_transactions.type', 'out')
-            ->whereBetween('stock_transactions.created_at', [$startDate, $endDate])
-            ->sum(DB::raw('stock_transactions.quantity * products.price'));
+            ->selectRaw('SUM(stock_transactions.quantity * products.price) as revenue')
+            ->value('revenue') ?? 0;
 
-        //Total inbound value (purchases)
+        // Total cost of outbound items (COGS)
+        $totalOutboundCost = (clone $baseQuery)
+            ->where('stock_transactions.type', 'out')
+            ->selectRaw('SUM(stock_transactions.quantity * products.cost) as cogs')
+            ->value('cogs') ?? 0;
+
+        // Total inbound value (Purchases)
         $totalInbound = (clone $baseQuery)
             ->where('stock_transactions.type', 'in')
-            ->whereBetween('stock_transactions.created_at', [$startDate, $endDate])
-            ->sum(DB::raw('stock_transactions.quantity * products.cost'));
+            ->selectRaw('SUM(stock_transactions.quantity * products.cost) as inbound')
+            ->value('inbound') ?? 0;
 
-        //Profit margin = (Sales - Cost) / Sales
+        // Profit margin calculation
         $profitMargin = $totalSales > 0
-            ? round((($totalSales - $totalInbound) / $totalSales) * 100, 2)
+            ? round((($totalSales - $totalOutboundCost) / $totalSales) * 100, 2)
             : 0;
 
-        //Low stock count
+        // Low stock count
         $lowStock = Product::when($supplierId, fn($q) => $q->where('supplier_id', $supplierId))
             ->whereColumn('quantity', '<=', 'threshold')
             ->count();
 
-        //Chart Data
+        // Chart data
         $chartData = StockTransaction::selectRaw("
-    DATE(created_at) as date,
-    SUM(CASE WHEN type = 'in' THEN quantity ELSE 0 END) as inbound,
-    SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END) as outbound
-")
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
+            DATE(created_at) as date,
+            SUM(CASE WHEN type = 'in' THEN quantity ELSE 0 END) as inbound,
+            SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END) as outbound
+        ")
+        ->when($supplierId, fn($q) => $q->whereHas('product', fn($q2) => $q2->where('supplier_id', $supplierId)))
+        ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
 
         // Product performance table
         $products = Product::when($supplierId, fn($q) => $q->where('supplier_id', $supplierId))
@@ -77,23 +81,23 @@ class ReportController extends Controller
                 ];
             });
 
-        //All suppliers for dropdown filter
+        // All suppliers for dropdown filter
         $suppliers = Supplier::select('id', 'name')->get();
 
         return Inertia::render('Reports/Index', [
             'metrics' => [
-                'totalSales' => (float) ($totalSales ?? 0),
-                'totalInbound' => (float) ($totalInbound ?? 0),
-                'profitMargin' => (float) ($profitMargin ?? 0),
-                'lowStock' => (int) ($lowStock ?? 0),
+                'totalSales' => (float) $totalSales,
+                'totalInbound' => (float) $totalInbound,
+                'profitMargin' => (float) $profitMargin,
+                'lowStock' => (int) $lowStock,
             ],
             'chartData' => $chartData,
             'products' => $products,
-            'suppliers' => \App\Models\Supplier::select('id', 'name')->get(),
+            'suppliers' => $suppliers,
             'filters' => [
                 'startDate' => $startDate instanceof \Carbon\Carbon ? $startDate->toDateString() : (string)$startDate,
                 'endDate' => $endDate instanceof \Carbon\Carbon ? $endDate->toDateString() : (string)$endDate,
-                'supplierId' => $request->input('supplierId', null),
+                'supplierId' => $supplierId,
             ],
         ]);
     }

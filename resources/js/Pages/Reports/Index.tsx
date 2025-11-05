@@ -59,14 +59,14 @@ export default function Reports({
     const safeNum = (val: any) =>
         typeof val === "number" && !isNaN(val) ? val : 0;
 
+const handleGenerate = () => {
+    router.get(
+        route("reports.index"),
+        { startDate, endDate, supplierId: supplierId || null },
+        { preserveState: true, replace: true }
+    );
+};
 
-    const handleGenerate = () => {
-        router.get(
-            route("reports.index"),
-            { startDate, endDate, supplierId },
-            { preserveState: true, replace: true }
-        );
-    };
 
     const handleReset = () => {
         setStartDate("");
