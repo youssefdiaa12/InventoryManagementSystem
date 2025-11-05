@@ -66,18 +66,18 @@ export default function Dashboard() {
     const [confirmDelete, setConfirmDelete] = useState<{ id: number; name: string } | null>(null);
 
 
-const handleDeleteUser = (userId: number, userName: string) => {
-  setConfirmDelete(null);
-  router.delete(route("users.destroy", userId), {
-    preserveScroll: true,
-    onSuccess: () => {
-      toast.success(`${userName} has been deleted successfully.`);
-    },
-    onError: () => {
-      toast.error("Failed to delete user. Try again.");
-    },
-  });
-};
+    const handleDeleteUser = (userId: number, userName: string) => {
+        setConfirmDelete(null);
+        router.delete(route("users.destroy", userId), {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(`${userName} has been deleted successfully.`);
+            },
+            onError: () => {
+                toast.error("Failed to delete user. Try again.");
+            },
+        });
+    };
 
 
 
@@ -351,13 +351,13 @@ const handleDeleteUser = (userId: number, userName: string) => {
                                                 <Pencil className="w-4 h-4 text-gray-500" />
                                             </Button> */}
                                             <Button
-  variant="ghost"
-  size="icon"
-  title="Delete"
-  onClick={() => setConfirmDelete({ id: u.id, name: u.name })}
->
-  <Trash2 className="w-4 h-4 text-red-500" />
-</Button>
+                                                variant="ghost"
+                                                size="icon"
+                                                title="Delete"
+                                                onClick={() => setConfirmDelete({ id: u.id, name: u.name })}
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
 
 
 
@@ -373,61 +373,61 @@ const handleDeleteUser = (userId: number, userName: string) => {
             </motion.div>
 
             <AnimatePresence>
-  {confirmDelete && (
-    <motion.div
-      className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative"
-      >
-        {/* Close Button */}
-        <button
-          onClick={() => setConfirmDelete(null)}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-        >
-          <X className="w-5 h-5" />
-        </button>
+                {confirmDelete && (
+                    <motion.div
+                        className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative"
+                        >
+                            {/* Close Button */}
+                            <button
+                                onClick={() => setConfirmDelete(null)}
+                                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
 
-        {/* Dialog Content */}
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          Confirm Deletion
-        </h2>
-        <p className="text-gray-600 mb-6">
-          Are you sure you want to delete{" "}
-          <span className="font-medium text-gray-900">
-            {confirmDelete.name}
-          </span>
-          ? This action cannot be undone.
-        </p>
+                            {/* Dialog Content */}
+                            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                                Confirm Deletion
+                            </h2>
+                            <p className="text-gray-600 mb-6">
+                                Are you sure you want to delete{" "}
+                                <span className="font-medium text-gray-900">
+                                    {confirmDelete.name}
+                                </span>
+                                ? This action cannot be undone.
+                            </p>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end space-x-3">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            onClick={() => setConfirmDelete(null)}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
-          >
-            Cancel
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            onClick={() => handleDeleteUser(confirmDelete.id, confirmDelete.name)}
-            className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-          >
-            Delete
-          </motion.button>
-        </div>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-3">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    onClick={() => setConfirmDelete(null)}
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                                >
+                                    Cancel
+                                </motion.button>
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    onClick={() => handleDeleteUser(confirmDelete.id, confirmDelete.name)}
+                                    className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                                >
+                                    Delete
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
 
         </DashboardLayout>
