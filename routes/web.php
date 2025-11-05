@@ -9,6 +9,7 @@ use App\Http\Controllers\StockTransactionController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -30,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::middleware(['auth', 'admin.only'])->group(function () {
+Route::middleware(['auth', 'verified', 'admin.only'])->group(function () {
     Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
     Route::get('/suppliers/create', [SupplierController::class, 'create'])->name('suppliers.create');
     Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
@@ -40,6 +41,11 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
     Route::post('/suppliers/{id}/restore', [SupplierController::class, 'restore'])->name('suppliers.restore');
     Route::delete('/suppliers/{id}/force-delete', [SupplierController::class, 'forceDelete'])->name('suppliers.forceDelete');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::put('/users/{user}/role', [UserController::class, 'updateRole'])
+    ->name('users.updateRole');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -75,14 +81,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/reports', [ReportController::class, 'index'])
     ->name('reports.index');
 
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::put('/users/{user}/role', [UserController::class, 'updateRole'])
-    ->name('users.updateRole');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        
 
-
-
-
+});
+Route::fallback(function () {
+    return Inertia::render('not-found/not-found', ["user" => Auth::user()]);
 });
 
 
