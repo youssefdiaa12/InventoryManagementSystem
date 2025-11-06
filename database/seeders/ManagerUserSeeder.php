@@ -4,20 +4,19 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
 
 class ManagerUserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
-        \App\Models\User::factory()->create([
-            'name' => 'Warehouse Manager',
-            'email' => 'manager@inventory.com',
-            'password' => bcrypt('password'),
-            'role' => 'manager',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'manager@inventory.com'],
+            [
+                'name' => 'Warehouse Manager',
+                'password' => bcrypt('password'),
+                'role' => 'manager',
+            ]
+        );
     }
 }
