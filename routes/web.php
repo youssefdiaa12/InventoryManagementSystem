@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+
+oute::get('/debug', function () {
+    try {
+        \DB::connection()->getPdo();
+        return 'Database connection OK';
+    } catch (\Exception $e) {
+        return 'DB connection failed: ' . $e->getMessage();
+    }
+})
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
