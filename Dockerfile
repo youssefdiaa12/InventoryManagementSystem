@@ -12,21 +12,22 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer and app
+# Copy composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY . .
-COPY .env.example /var/www/html/.env.example
 
-# Ensure .env exists
-RUN if [ ! -f ".env" ]; then cp .env.example .env; fi
+# Copy application files
+COPY . .
+
+# Copy example environment file (but do NOT create .env here)
+COPY .env.example /var/www/html/.env.example
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Install frontend dependencies + build assets
+# Install frontend dependencies and build assets
 RUN npm install && npm run build
 
-# Copy wait-for-it.sh script into the image
+# Copy wait-for-it.sh
 COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
 RUN chmod +x /usr/local/bin/wait-for-it.sh
 
@@ -43,5 +44,5 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/apache2.conf \
     /etc/apache2/conf-available/*.conf
 
-# Start Apache (default) - migrations will run via docker-compose command override
+# Default command
 CMD ["apache2-foreground"]

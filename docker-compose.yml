@@ -4,6 +4,9 @@ services:
   app:
     image: dada22/inventory-app:latest
     container_name: inventory_app
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8081:80"
     environment:
@@ -20,17 +23,19 @@ services:
       sh -c "
       /usr/local/bin/wait-for-it.sh db:3306 --timeout=30 --strict &&
       echo 'Database is up!' &&
-      if [ ! -s .env ] || ! grep -q 'APP_KEY=' .env; then
-        echo 'Generating .env and APP_KEY...' &&
+
+      if [ ! -f .env ] || ! grep -q 'APP_KEY=base64:' .env; then
+        echo 'Creating .env and generating APP_KEY...' &&
         cp .env.example .env &&
         php artisan key:generate --force
       fi &&
-      echo 'Installing PHP dependencies...' &&
-      composer install --no-interaction --optimize-autoloader &&
+
       echo 'Running migrations...' &&
       php artisan migrate --force &&
+
       echo 'Seeding database...' &&
       php artisan db:seed --force &&
+
       echo 'Starting Apache...' &&
       apache2-foreground
       "
