@@ -19,7 +19,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # Copy example environment file (but do NOT create .env here)
-COPY .env.example /var/www/html/.env.example
+COPY .env.example /var/www/html/.env.
+
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
